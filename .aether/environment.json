@@ -1,0 +1,7 @@
+{
+  "setup": "npm ci && npx playwright install chromium",
+  "terminals": [
+    { "name": "api", "command": "npm run dev:api" },
+    { "name": "web", "command": "npm run dev:web" }
+  ]
+}
