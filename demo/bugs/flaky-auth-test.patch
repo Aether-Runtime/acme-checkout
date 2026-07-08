@@ -1,0 +1,36 @@
+diff --git a/tests/auth.test.ts b/tests/auth.test.ts
+index 8b1371b..8586e2d 100644
+--- a/tests/auth.test.ts
++++ b/tests/auth.test.ts
+@@ -1,18 +1,28 @@
+ import { beforeEach, describe, expect, it } from 'vitest';
+-import { activeSessionCount, issueSession, resetAuth, validateSession } from '../src/auth';
++import {
++  activeSessionCount,
++  issueSession,
++  resetAuth,
++  SESSION_TTL_MS,
++  validateSession,
++} from '../src/auth';
+ 
+ describe('sessions', () => {
+   beforeEach(() => {
+     resetAuth();
+   });
+ 
+-  it('issues a token that authenticates requests until it expires', () => {
++  it('issues a token that authenticates requests until it expires', async () => {
+     const session = issueSession();
+     expect(validateSession(session.token)).not.toBeNull();
+     expect(validateSession('sess_bogus')).toBeNull();
+     expect(activeSessionCount()).toBe(1);
++    // Sessions stay valid right up to the expiry boundary.
++    const short = issueSession(Date.now() - SESSION_TTL_MS + 13);
++    await new Promise((resolve) => setTimeout(resolve, 10));
++    expect(validateSession(short.token)).not.toBeNull();
+     // Validation past the expiry drops the session entirely.
+     expect(validateSession(session.token, session.expiresAt + 1)).toBeNull();
+-    expect(activeSessionCount()).toBe(0);
++    expect(activeSessionCount()).toBe(1);
+   });
+ });

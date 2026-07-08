@@ -1,0 +1,26 @@
+diff --git a/src/webhooks/checkout.ts b/src/webhooks/checkout.ts
+index 798021c..8af7959 100644
+--- a/src/webhooks/checkout.ts
++++ b/src/webhooks/checkout.ts
+@@ -1,5 +1,4 @@
+ import { retryCheckout } from '../checkout';
+-import { findCharge } from '../payments';
+ import type { PaymentEvent } from '../types';
+ 
+ export interface RetryOutcome {
+@@ -22,15 +21,6 @@ export function handleRetry(event: PaymentEvent): RetryOutcome {
+   if (event.type !== 'charge.failed') {
+     return { handled: false, retried: false, reason: `ignoring event type ${event.type}` };
+   }
+-  const charge = findCharge(event);
+-  if (charge && charge.status === 'succeeded') {
+-    return {
+-      handled: true,
+-      retried: false,
+-      chargeId: charge.id,
+-      reason: 'charge already succeeded; duplicate delivery ignored',
+-    };
+-  }
+   const result = retryCheckout(event.checkoutId);
+   return {
+     handled: true,
