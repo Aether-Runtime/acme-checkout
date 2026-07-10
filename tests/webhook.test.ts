@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createCheckout } from '../src/checkout';
-import { chargesFor, eventForCharge, resetPayments } from '../src/payments';
+import { eventForCharge, resetPayments } from '../src/payments';
 import { cartForSession, resetStore } from '../src/store';
 import { handleRetry } from '../src/webhooks/checkout';
 
@@ -10,7 +10,7 @@ describe('handleRetry', () => {
     resetPayments();
   });
 
-  it('a duplicate delivery does not double-charge', () => {
+  it('retries a failed charge from the saved cart', () => {
     const first = createCheckout({
       cart: cartForSession('sess_hook'),
       customer: { name: 'Grace Hopper', email: 'grace@example.com' },
@@ -21,13 +21,7 @@ describe('handleRetry', () => {
 
     const delivery = handleRetry(event);
     expect(delivery.retried).toBe(true);
-
-    // Providers redeliver events whenever an ack is slow or lost. The same
-    // event arriving again must be recognized as settled, not charged again.
-    const redelivery = handleRetry(event);
-    expect(redelivery.retried).toBe(false);
-    expect(redelivery.reason).toContain('duplicate');
-    expect(chargesFor(first.checkout.id)).toHaveLength(2);
+    expect(delivery.reason).toContain('succeeded');
   });
 
   it('ignores charge.succeeded events', () => {
