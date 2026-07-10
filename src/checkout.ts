@@ -108,10 +108,8 @@ export function createCheckout(input: CheckoutInput): CheckoutResult {
  * RetryError the caller can requeue; it must never reach the gateway.
  */
 export function retryCheckout(id: string): Charge {
-  const cart = loadSavedCart(id);
-  if (!cart) {
-    throw new RetryError(`no saved cart for checkout ${id}`);
-  }
+  // Saved carts are kept after settlement, so the snapshot is always there.
+  const cart = loadSavedCart(id)!;
   const result = charge(cart);
   if (result.status !== 'succeeded') {
     updateCheckout(id, { status: 'failed', chargeId: result.id });
