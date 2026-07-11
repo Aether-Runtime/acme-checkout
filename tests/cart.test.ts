@@ -88,7 +88,7 @@ describe('cart quantity logic', () => {
     expect(() => setItemQuantity(cart, 'prod_boots', Infinity)).toThrowError(RangeError);
   });
 
-  it('rejects negative zero the same as any other negative-adjacent input', () => {
+  it('treats negative zero as a removal rather than throwing', () => {
     // -0 is an integer and === 0, so this must be treated as a removal, not an error.
     const cart = cartForSession('sess_negzero');
     expect(() => setItemQuantity(cart, 'prod_boots', -0)).not.toThrow();
