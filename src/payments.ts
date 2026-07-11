@@ -77,6 +77,10 @@ export function chargesFor(checkoutId: string): Charge[] {
   return charges.filter((record) => record.checkoutId === checkoutId);
 }
 
+export function getCharge(id: string): Charge | null {
+  return charges.find((record) => record.id === id) ?? null;
+}
+
 /** Builds the webhook event a provider would deliver for a charge. */
 export function eventForCharge(record: Charge): PaymentEvent {
   eventCounter += 1;

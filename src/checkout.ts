@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { charge } from './payments';
+import { charge, getCharge } from './payments';
 import {
   cartTotal,
   getCheckout,
@@ -111,6 +111,15 @@ export function retryCheckout(id: string): Charge {
   const cart = loadSavedCart(id);
   if (!cart) {
     throw new RetryError(`no saved cart for checkout ${id}`);
+  }
+  // A redelivered charge.failed event for a checkout that already settled
+  // must not re-charge the customer; resolve it against the prior charge.
+  const existingCheckout = getCheckout(id);
+  if (existingCheckout?.status === 'succeeded' && existingCheckout.chargeId) {
+    const settledCharge = getCharge(existingCheckout.chargeId);
+    if (settledCharge) {
+      return settledCharge;
+    }
   }
   const result = charge(cart);
   if (result.status !== 'succeeded') {
