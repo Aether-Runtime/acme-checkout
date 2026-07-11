@@ -31,12 +31,17 @@ export interface CheckoutResult {
   order?: Order;
 }
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 function validateInput(input: CheckoutInput): void {
   if (input.cart.items.length === 0) {
     throw new Error('checkout requires a non-empty cart');
   }
-  if (!input.customer.name.trim() || !input.customer.email.includes('@')) {
-    throw new Error('checkout requires a customer name and email');
+  if (!input.customer.name.trim()) {
+    throw new Error('checkout requires a customer name');
+  }
+  if (!EMAIL_PATTERN.test(input.customer.email.trim())) {
+    throw new Error('checkout requires a valid email address');
   }
   const digits = input.card.number.replace(/\s+/g, '');
   if (!/^\d{12,19}$/.test(digits)) {
@@ -72,12 +77,16 @@ function recordOrder(checkoutId: string, cart: Cart): Order {
  */
 export function createCheckout(input: CheckoutInput): CheckoutResult {
   validateInput(input);
+  const customer: Customer = {
+    name: input.customer.name.trim(),
+    email: input.customer.email.trim(),
+  };
   const checkoutId = `co_${randomUUID().slice(0, 8)}`;
   const snapshot: Cart = {
     id: input.cart.id,
     checkoutId,
     items: structuredClone(input.cart.items),
-    customer: input.customer,
+    customer,
     card: input.card,
   };
   saveCart(checkoutId, snapshot);
