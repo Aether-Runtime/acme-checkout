@@ -97,9 +97,7 @@ describe('cart quantity logic', () => {
 
   it('throws for an unknown product id when adding a new line item', () => {
     const cart = cartForSession('sess_unknown');
-    expect(() => setItemQuantity(cart, 'prod_does_not_exist', 1)).toThrowError(
-      /unknown product/,
-    );
+    expect(() => setItemQuantity(cart, 'prod_does_not_exist', 1)).toThrowError(/unknown product/);
     expect(cart.items).toHaveLength(2);
   });
 
