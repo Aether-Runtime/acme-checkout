@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createCheckout } from '../src/checkout';
-import { eventForCharge, resetPayments } from '../src/payments';
+import { chargesFor, eventForCharge, resetPayments } from '../src/payments';
 import { cartForSession, resetStore } from '../src/store';
 import { handleRetry } from '../src/webhooks/checkout';
 
@@ -22,6 +22,25 @@ describe('handleRetry', () => {
     const delivery = handleRetry(event);
     expect(delivery.retried).toBe(true);
     expect(delivery.reason).toContain('succeeded');
+  });
+
+  it('does not recharge on a redelivered charge.failed event after settlement', () => {
+    const first = createCheckout({
+      cart: cartForSession('sess_hook_dup'),
+      customer: { name: 'Grace Hopper', email: 'grace@example.com' },
+      card: { number: '4000 0000 0000 0341', expMonth: 12, expYear: 2030, cvc: '314' },
+    });
+    const event = eventForCharge(first.charge);
+
+    const delivery = handleRetry(event);
+    expect(delivery.retried).toBe(true);
+    expect(chargesFor(first.checkout.id)).toHaveLength(2);
+
+    // The provider redelivers the same stale event; it must be a no-op.
+    const redelivery = handleRetry(event);
+    expect(redelivery.retried).toBe(true);
+    expect(redelivery.chargeId).toBe(delivery.chargeId);
+    expect(chargesFor(first.checkout.id)).toHaveLength(2);
   });
 
   it('ignores charge.succeeded events', () => {

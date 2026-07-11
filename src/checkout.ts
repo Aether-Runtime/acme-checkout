@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { charge } from './payments';
+import { charge, chargesFor } from './payments';
 import {
   cartTotal,
   getCheckout,
@@ -106,11 +106,22 @@ export function createCheckout(input: CheckoutInput): CheckoutResult {
  * Retries a previously failed checkout from its saved cart snapshot. Retries
  * are driven by provider webhooks, so a missing snapshot must surface as a
  * RetryError the caller can requeue; it must never reach the gateway.
+ *
+ * Providers redeliver webhooks at least once, so a checkout that already
+ * settled must not be recharged: return the charge that settled it instead.
  */
 export function retryCheckout(id: string): Charge {
   const cart = loadSavedCart(id);
   if (!cart) {
     throw new RetryError(`no saved cart for checkout ${id}`);
+  }
+  const checkout = getCheckout(id);
+  if (checkout?.status === 'succeeded') {
+    const settledCharge = chargesFor(id).find((c) => c.id === checkout.chargeId);
+    if (!settledCharge) {
+      throw new Error(`checkout ${id} is succeeded but has no matching charge`);
+    }
+    return settledCharge;
   }
   const result = charge(cart);
   if (result.status !== 'succeeded') {
