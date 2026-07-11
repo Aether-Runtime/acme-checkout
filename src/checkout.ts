@@ -77,12 +77,16 @@ function recordOrder(checkoutId: string, cart: Cart): Order {
  */
 export function createCheckout(input: CheckoutInput): CheckoutResult {
   validateInput(input);
+  const customer: Customer = {
+    name: input.customer.name.trim(),
+    email: input.customer.email.trim(),
+  };
   const checkoutId = `co_${randomUUID().slice(0, 8)}`;
   const snapshot: Cart = {
     id: input.cart.id,
     checkoutId,
     items: structuredClone(input.cart.items),
-    customer: input.customer,
+    customer,
     card: input.card,
   };
   saveCart(checkoutId, snapshot);

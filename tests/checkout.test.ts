@@ -60,10 +60,11 @@ describe('createCheckout', () => {
     expect(() => createCheckout(input)).toThrowError(/valid email/);
   });
 
-  it('accepts well-formed emails, ignoring surrounding whitespace', () => {
+  it('accepts well-formed emails, ignoring surrounding whitespace, and stores the trimmed value', () => {
     const input = checkoutInput('4242 4242 4242 4242');
     input.customer.email = '  ada@example.com  ';
     const result = createCheckout(input);
     expect(result.charge.status).toBe('succeeded');
+    expect(result.order?.customer.email).toBe('ada@example.com');
   });
 });
