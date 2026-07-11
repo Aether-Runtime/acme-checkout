@@ -39,4 +39,31 @@ describe('createCheckout', () => {
     input.cart.items = [];
     expect(() => createCheckout(input)).toThrowError(/non-empty cart/);
   });
+
+  it('rejects a missing customer name', () => {
+    const input = checkoutInput('4242 4242 4242 4242');
+    input.customer.name = '   ';
+    expect(() => createCheckout(input)).toThrowError(/customer name/);
+  });
+
+  it.each([
+    ['empty string', ''],
+    ['missing @', 'ada.example.com'],
+    ['missing domain', 'ada@'],
+    ['missing TLD', 'ada@example'],
+    ['double @', 'ada@@example.com'],
+    ['contains a space', 'ada lovelace@example.com'],
+    ['only whitespace', '   '],
+  ])('rejects an email that is %s (%s)', (_label, email) => {
+    const input = checkoutInput('4242 4242 4242 4242');
+    input.customer.email = email;
+    expect(() => createCheckout(input)).toThrowError(/valid email/);
+  });
+
+  it('accepts well-formed emails, ignoring surrounding whitespace', () => {
+    const input = checkoutInput('4242 4242 4242 4242');
+    input.customer.email = '  ada@example.com  ';
+    const result = createCheckout(input);
+    expect(result.charge.status).toBe('succeeded');
+  });
 });
