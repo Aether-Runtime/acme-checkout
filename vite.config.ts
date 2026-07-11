@@ -10,9 +10,9 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-    // Dev often runs in a cloud devbox behind a forwarding proxy; accept its
-    // public hostnames instead of only localhost.
-    host: true,
+    // Dev often runs in a cloud devbox whose forwarding proxy reaches the VM
+    // over IPv6; bind dual-stack (not 0.0.0.0) and accept the proxy hostnames.
+    host: '::',
     allowedHosts: ['.preview.runaether.dev'],
     proxy: {
       '/api': 'http://localhost:4000',
