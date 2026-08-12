@@ -12,7 +12,7 @@ export function CartView({
 }) {
   return (
     <section className="panel" data-testid="cart">
-      <h1>Your cart</h1>
+      <h1>Your bag</h1>
       <ul className="lines">
         {cart.cart.items.map((item) => (
           <li key={item.productId} className="line" data-testid="cart-line">
