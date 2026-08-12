@@ -46,12 +46,12 @@ export function CartView({
       </div>
       <button
         type="button"
-        className="primary"
+        className="primary checkout-launch"
         data-testid="go-to-checkout"
         onClick={onCheckout}
         disabled={cart.cart.items.length === 0}
       >
-        Check out
+        Launch
       </button>
     </section>
   );

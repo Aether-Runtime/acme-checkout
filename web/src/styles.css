@@ -137,6 +137,11 @@ button.primary:disabled {
   cursor: default;
 }
 
+button.checkout-launch {
+  background: #2e9e4f;
+  color: #ffffff;
+}
+
 form {
   display: flex;
   flex-direction: column;
