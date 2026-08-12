@@ -47,11 +47,12 @@ export function CartView({
       <button
         type="button"
         className="primary"
+        style={{ background: '#22c55e' }}
         data-testid="go-to-checkout"
         onClick={onCheckout}
         disabled={cart.cart.items.length === 0}
       >
-        Check out
+        Launch
       </button>
     </section>
   );
