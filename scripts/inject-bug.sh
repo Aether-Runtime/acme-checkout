@@ -5,7 +5,7 @@ set -euo pipefail
 
 usage() {
   echo "usage: scripts/inject-bug.sh [--revert] <name>" >&2
-  echo "names: retry-null-cart, double-charge-webhook, flaky-auth-test" >&2
+  echo "names: retry-null-cart, double-charge-webhook, flaky-auth-test, mobile-summary-overflow" >&2
   exit 1
 }
 

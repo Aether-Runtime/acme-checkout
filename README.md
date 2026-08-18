@@ -46,4 +46,5 @@ scripts/inject-bug.sh --revert retry-null-cart
 
 Available bugs: `retry-null-cart` (retry crashes instead of requeueing),
 `double-charge-webhook` (duplicate delivery re-charges the shopper), and
-`flaky-auth-test` (an order-dependent test assertion).
+`flaky-auth-test` (an order-dependent test assertion), and
+`mobile-summary-overflow` (the cart summary breaks out of its card on phones).
