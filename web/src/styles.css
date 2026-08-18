@@ -76,8 +76,9 @@ h1 {
 
 .line {
   display: grid;
-  grid-template-columns: 1fr 300px;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
+  gap: 12px;
   padding: 14px 0;
   border-bottom: 1px solid var(--line);
 }
@@ -119,7 +120,8 @@ h1 {
 
 .total-row {
   display: grid;
-  grid-template-columns: 1fr 300px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
   padding: 16px 0;
   font-size: 1.05rem;
 }
