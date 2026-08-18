@@ -7,7 +7,8 @@
     },
     {
       "name": "web",
-      "command": "npm run dev:web"
+      "command": "npm run dev:web",
+      "port": 5173
     }
   ],
   "setup_on_boot": "npx playwright install chromium || true"

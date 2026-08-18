@@ -10,6 +10,9 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    // The port is declared in .aether/environment.json for preview links;
+    // never drift to 5174 when 5173 is somehow taken.
+    strictPort: true,
     // Dev often runs in a cloud devbox whose forwarding proxy reaches the VM
     // over IPv6; bind dual-stack (not 0.0.0.0) and accept the proxy hostnames.
     host: '::',
