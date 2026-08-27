@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { fetchCart, setQuantity } from './api';
+import { applyPromoCode, fetchCart, setQuantity } from './api';
 import type { CartPayload } from './api';
 import { CartView } from './components/CartView';
 import { CheckoutForm } from './components/CheckoutForm';
@@ -11,6 +11,7 @@ export function App() {
   const [view, setView] = useState<View>('cart');
   const [cart, setCart] = useState<CartPayload | null>(null);
   const [orderId, setOrderId] = useState<string | null>(null);
+  const [amountCharged, setAmountCharged] = useState<number | null>(null);
 
   useEffect(() => {
     void fetchCart().then(setCart);
@@ -20,8 +21,18 @@ export function App() {
     setCart(await setQuantity(productId, quantity));
   }, []);
 
-  const handlePaid = useCallback((id: string) => {
+  const handlePromo = useCallback(async (code: string) => {
+    const payload = await applyPromoCode(code);
+    if (payload.error) {
+      return payload.error;
+    }
+    setCart(payload);
+    return null;
+  }, []);
+
+  const handlePaid = useCallback((id: string, amountChargedCents?: number) => {
     setOrderId(id);
+    setAmountCharged(amountChargedCents ?? null);
     setView('confirmation');
   }, []);
 
@@ -39,12 +50,15 @@ export function App() {
             cart={cart}
             onQuantity={handleQuantity}
             onCheckout={() => setView('checkout')}
+            onPromo={handlePromo}
           />
         )}
         {view === 'checkout' && cart && (
           <CheckoutForm total={cart.totalCents} onPaid={handlePaid} />
         )}
-        {view === 'confirmation' && orderId && <Confirmation orderId={orderId} />}
+        {view === 'confirmation' && orderId && (
+          <Confirmation orderId={orderId} amountChargedCents={amountCharged} />
+        )}
       </main>
       <footer className="colophon">Acme Outfitters is a demo shop. Nothing is real.</footer>
     </div>

@@ -7,7 +7,7 @@ export function CheckoutForm({
   onPaid,
 }: {
   total: number;
-  onPaid: (orderId: string) => void;
+  onPaid: (orderId: string, amountChargedCents?: number) => void;
 }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -22,7 +22,7 @@ export function CheckoutForm({
     const result = await submitCheckout({ name, email, cardNumber });
     setBusy(false);
     if (result.status === 'succeeded' && result.orderId) {
-      onPaid(result.orderId);
+      onPaid(result.orderId, result.amountChargedCents);
       return;
     }
     setError(result.failureReason ?? result.error ?? 'payment failed');

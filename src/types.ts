@@ -24,6 +24,12 @@ export interface Card {
   cvc: string;
 }
 
+/** A percentage discount a shopper can apply to their cart at checkout. */
+export interface PromoCode {
+  code: string;
+  percentOff: number;
+}
+
 /**
  * A cart is either a live shopping cart (items only) or, once a checkout has
  * started, a snapshot bound to a checkout with the customer and card attached.
@@ -35,6 +41,7 @@ export interface Cart {
   checkoutId?: string;
   customer?: Customer;
   card?: Card;
+  promo?: PromoCode;
 }
 
 export type ChargeStatus = 'succeeded' | 'failed' | 'pending';

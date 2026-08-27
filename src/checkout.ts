@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { charge, chargesFor } from './payments';
 import {
-  cartTotal,
+  chargeableTotal,
   getCheckout,
   insertCheckout,
   insertOrder,
@@ -57,7 +57,7 @@ function recordOrder(checkoutId: string, cart: Cart): Order {
     checkoutId,
     customer: cart.customer,
     items: structuredClone(cart.items),
-    totalCents: cartTotal(cart),
+    totalCents: chargeableTotal(cart),
     createdAt: Date.now(),
   };
   insertOrder(order);
@@ -79,6 +79,7 @@ export function createCheckout(input: CheckoutInput): CheckoutResult {
     items: structuredClone(input.cart.items),
     customer: input.customer,
     card: input.card,
+    promo: input.cart.promo,
   };
   saveCart(checkoutId, snapshot);
   insertCheckout({

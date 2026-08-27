@@ -7,13 +7,18 @@ export interface CartItem {
 
 export interface CartPayload {
   cart: { id: string; items: CartItem[] };
+  subtotalCents: number;
+  discountCents: number;
   totalCents: number;
+  promo: { code: string; percentOff: number } | null;
+  error?: string;
 }
 
 export interface CheckoutPayload {
   checkoutId: string;
   status: string;
   orderId?: string;
+  amountChargedCents?: number;
   failureReason?: string;
   error?: string;
 }
@@ -51,6 +56,13 @@ export function setQuantity(productId: string, quantity: number): Promise<CartPa
   return request<CartPayload>('/api/cart/items', {
     method: 'PUT',
     body: JSON.stringify({ productId, quantity }),
+  });
+}
+
+export function applyPromoCode(code: string): Promise<CartPayload> {
+  return request<CartPayload>('/api/cart/promo', {
+    method: 'POST',
+    body: JSON.stringify({ code }),
   });
 }
 

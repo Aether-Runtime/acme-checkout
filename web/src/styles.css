@@ -130,6 +130,58 @@ h1 {
   justify-self: end;
 }
 
+.promo-row {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  padding: 14px 0 2px;
+}
+
+.promo-row input {
+  flex: 1;
+}
+
+.promo-row button {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.promo-row button:hover {
+  border-color: var(--muted);
+}
+
+.promo-applied {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  padding: 14px 0 2px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.promo-applied .discount {
+  color: var(--accent);
+  justify-self: end;
+}
+
+.subtotal-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  padding: 12px 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.subtotal-row span:last-child {
+  justify-self: end;
+}
+
 button.primary {
   width: 100%;
   padding: 12px 16px;

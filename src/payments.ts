@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { cartTotal } from './store';
+import { chargeableTotal } from './store';
 import type { Cart, Charge, ChargeStatus, PaymentEvent } from './types';
 
 /**
@@ -47,7 +47,7 @@ export function charge(cart: Cart): Charge {
   const record: Charge = {
     id: `ch_${randomUUID().slice(0, 12)}`,
     checkoutId: cart.checkoutId,
-    amountCents: cartTotal(cart),
+    amountCents: chargeableTotal(cart),
     currency: 'usd',
     status: outcome.status,
     failureReason: outcome.failureReason,
