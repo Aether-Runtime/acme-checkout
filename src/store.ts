@@ -97,6 +97,7 @@ export function clearCartForSession(sessionToken: string): void {
   const cart = cartsBySession.get(sessionToken);
   if (cart) {
     cart.items = [];
+    delete cart.promo;
   }
 }
 
@@ -131,7 +132,7 @@ export function findPromoCode(code: string): PromoCode | null {
 }
 
 export function applyPromo(cart: Cart, promo: PromoCode): Cart {
-  cart.promo = promo;
+  cart.promo = { ...promo };
   return cart;
 }
 
