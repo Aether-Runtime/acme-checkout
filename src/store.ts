@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import type { Cart, CartItem, Checkout, Order, Product } from './types';
+import type { Cart, CartItem, Checkout, Order, Product, PromoCode } from './types';
 
 /**
  * In-memory storage. Every collection lives in module state and is reseeded
@@ -30,6 +30,12 @@ export const SEED_PRODUCTS: Product[] = [
 
 /** Product ids placed in every fresh cart. The bottle stays as a suggestion. */
 const SEED_CART_PRODUCT_IDS = ['prod_boots', 'prod_beanie'];
+
+/** Promo codes the shop honors. Codes are matched case-insensitively. */
+export const SEED_PROMO_CODES: PromoCode[] = [
+  { code: 'TRAIL10', percentOff: 10 },
+  { code: 'WELCOME15', percentOff: 15 },
+];
 
 const products = new Map<string, Product>();
 const cartsBySession = new Map<string, Cart>();
@@ -117,6 +123,29 @@ export function setItemQuantity(cart: Cart, productId: string, quantity: number)
 
 export function cartTotal(cart: Cart): number {
   return cart.items.reduce((sum, item) => sum + item.unitCents * item.quantity, 0);
+}
+
+export function findPromoCode(code: string): PromoCode | null {
+  const normalized = code.trim().toUpperCase();
+  return SEED_PROMO_CODES.find((promo) => promo.code === normalized) ?? null;
+}
+
+export function applyPromo(cart: Cart, promo: PromoCode): Cart {
+  cart.promo = promo;
+  return cart;
+}
+
+/** Cents taken off the cart subtotal by its promo code, if one is applied. */
+export function promoDiscountCents(cart: Cart): number {
+  if (!cart.promo) {
+    return 0;
+  }
+  return Math.round((cartTotal(cart) * cart.promo.percentOff) / 100);
+}
+
+/** The amount the shopper owes: the subtotal minus any promo discount. */
+export function chargeableTotal(cart: Cart): number {
+  return cartTotal(cart) - promoDiscountCents(cart);
 }
 
 /**

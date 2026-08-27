@@ -6,21 +6,36 @@ import type { NextFunction, Request, Response } from 'express';
 import { issueSession, validateSession } from './auth';
 import { createCheckout } from './checkout';
 import {
+  applyPromo,
   cartForSession,
   cartTotal,
+  chargeableTotal,
   clearCartForSession,
+  findPromoCode,
   getOrder,
   listProducts,
+  promoDiscountCents,
   setItemQuantity,
 } from './store';
 import { handleRetry } from './webhooks/checkout';
-import type { PaymentEvent } from './types';
+import type { Cart, PaymentEvent } from './types';
 
 /**
  * Webhook deliveries are authenticated with a shared secret header. The demo
  * gateway is local, so the secret is a fixture, not a credential.
  */
 export const PROVIDER_SIGNATURE = 'whsec_demo_0001';
+
+/** The cart as the storefront renders it: subtotal, discount, and total due. */
+function cartPayload(cart: Cart) {
+  return {
+    cart,
+    subtotalCents: cartTotal(cart),
+    discountCents: promoDiscountCents(cart),
+    totalCents: chargeableTotal(cart),
+    promo: cart.promo ?? null,
+  };
+}
 
 function requireSession(req: Request, res: Response, next: NextFunction): void {
   const token = req.header('x-session-token');
@@ -52,7 +67,23 @@ export function createApp(): express.Express {
 
   app.get('/api/cart', requireSession, (_req, res) => {
     const cart = cartForSession(res.locals.sessionToken as string);
-    res.json({ cart, totalCents: cartTotal(cart) });
+    res.json(cartPayload(cart));
+  });
+
+  app.post('/api/cart/promo', requireSession, (req, res) => {
+    const { code } = req.body as { code?: string };
+    if (typeof code !== 'string' || !code.trim()) {
+      res.status(400).json({ error: 'a promo code is required' });
+      return;
+    }
+    const promo = findPromoCode(code);
+    if (!promo) {
+      res.status(400).json({ error: 'promo code not recognized' });
+      return;
+    }
+    const cart = cartForSession(res.locals.sessionToken as string);
+    applyPromo(cart, promo);
+    res.json(cartPayload(cart));
   });
 
   app.put('/api/cart/items', requireSession, (req, res) => {
@@ -68,7 +99,7 @@ export function createApp(): express.Express {
       res.status(400).json({ error: (error as Error).message });
       return;
     }
-    res.json({ cart, totalCents: cartTotal(cart) });
+    res.json(cartPayload(cart));
   });
 
   app.post('/api/checkout', requireSession, (req, res) => {
@@ -111,6 +142,7 @@ export function createApp(): express.Express {
       checkoutId: result.checkout.id,
       status: 'succeeded',
       orderId: result.order?.id,
+      amountChargedCents: result.charge.amountCents,
     });
   });
 
