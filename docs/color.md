@@ -1,1 +1,2 @@
 Color: Blue
+Size: Large
