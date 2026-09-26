@@ -1,3 +1,4 @@
 - An empty cart is rejected before any checkout or charge is created.
 - Card numbers must be 12-19 digits after stripping whitespace.
 - A retried checkout that already has an order must not create a second one.
+- Expired cards are declined.
