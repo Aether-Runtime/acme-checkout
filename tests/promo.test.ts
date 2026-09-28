@@ -33,6 +33,16 @@ describe('promo codes', () => {
     expect(chargeableTotal(cart)).toBe(15930);
   });
 
+  it('rejects promos whose percentOff is outside 1-90 and leaves the cart untouched', () => {
+    const cart = cartForSession('sess_range');
+    for (const percentOff of [0, 91, -5, 12.5]) {
+      expect(() => applyPromo(cart, { code: 'BAD', percentOff })).toThrow(RangeError);
+      expect(cart.promo).toBeUndefined();
+    }
+    expect(applyPromo(cart, { code: 'MIN', percentOff: 1 }).promo?.percentOff).toBe(1);
+    expect(applyPromo(cart, { code: 'MAX', percentOff: 90 }).promo?.percentOff).toBe(90);
+  });
+
   it('takes 20% off with SUMMER20', () => {
     const cart = cartForSession('sess_summer');
     applyPromo(cart, findPromoCode('summer20')!);
