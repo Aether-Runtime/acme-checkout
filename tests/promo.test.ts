@@ -33,6 +33,13 @@ describe('promo codes', () => {
     expect(chargeableTotal(cart)).toBe(15930);
   });
 
+  it('takes 20% off with SUMMER20', () => {
+    const cart = cartForSession('sess_summer');
+    applyPromo(cart, findPromoCode('summer20')!);
+    expect(promoDiscountCents(cart)).toBe(3540);
+    expect(chargeableTotal(cart)).toBe(14160);
+  });
+
   it('carries no discount when the cart has no promo', () => {
     const cart = cartForSession('sess_plain');
     expect(promoDiscountCents(cart)).toBe(0);
