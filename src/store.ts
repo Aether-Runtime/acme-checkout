@@ -35,6 +35,7 @@ const SEED_CART_PRODUCT_IDS = ['prod_boots', 'prod_beanie'];
 export const SEED_PROMO_CODES: PromoCode[] = [
   { code: 'TRAIL10', percentOff: 10 },
   { code: 'WELCOME15', percentOff: 15 },
+  { code: 'SUMMER20', percentOff: 20 },
 ];
 
 const products = new Map<string, Product>();
