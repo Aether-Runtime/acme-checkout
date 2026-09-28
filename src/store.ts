@@ -133,6 +133,9 @@ export function findPromoCode(code: string): PromoCode | null {
 }
 
 export function applyPromo(cart: Cart, promo: PromoCode): Cart {
+  if (!Number.isInteger(promo.percentOff) || promo.percentOff < 1 || promo.percentOff > 90) {
+    throw new RangeError(`percentOff must be an integer from 1 to 90, got ${promo.percentOff}`);
+  }
   cart.promo = { ...promo };
   return cart;
 }

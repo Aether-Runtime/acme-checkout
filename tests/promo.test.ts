@@ -40,6 +40,16 @@ describe('promo codes', () => {
     expect(chargeableTotal(cart)).toBe(14160);
   });
 
+  it('rejects promo codes outside 1–90% off', () => {
+    const cart = cartForSession('sess_range');
+    for (const percentOff of [0, 91, 100, -5, 12.5]) {
+      expect(() => applyPromo(cart, { code: 'BAD', percentOff })).toThrow(RangeError);
+      expect(cart.promo).toBeUndefined();
+    }
+    expect(applyPromo(cart, { code: 'MIN', percentOff: 1 }).promo?.percentOff).toBe(1);
+    expect(applyPromo(cart, { code: 'MAX', percentOff: 90 }).promo?.percentOff).toBe(90);
+  });
+
   it('carries no discount when the cart has no promo', () => {
     const cart = cartForSession('sess_plain');
     expect(promoDiscountCents(cart)).toBe(0);
