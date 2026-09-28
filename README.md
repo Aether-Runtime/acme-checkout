@@ -1,3 +1,4 @@
+<!-- acme-checkout: Express API + React storefront for the Acme demo shop, with a fake local payment gateway. -->
 # acme-checkout
 
 Checkout service and storefront for the Acme demo shop: an Express API and a
